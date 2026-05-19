@@ -1,5 +1,6 @@
 import { pool } from '../db.js';
-import { gerarQRCode } from '../services/inter.js';
+import { gerarQRCode, MOCK_MODE } from '../services/inter.js';
+import { processarSplit } from './split.js';
 import { v4 as uuidv4 } from 'uuid';
 
 async function cobrancasRoutes(fastify, options) {
@@ -84,6 +85,39 @@ async function cobrancasRoutes(fastify, options) {
       return { status: 'ok', versao: '1.0.0', banco: 'conectado' };
     } catch (error) {
       return { status: 'error', versao: '1.0.0', banco: 'desconectado', error: error.message };
+    } finally {
+      client.release();
+    }
+  });
+
+  fastify.post('/zighu/mock/simular-pagamento', async (request, reply) => {
+    if (!MOCK_MODE) {
+      return reply.status(403).send({ error: 'Rota só disponível em modo mock' });
+    }
+
+    const { corrida_id } = request.body;
+    const client = await pool.connect();
+    try {
+      const cobResult = await client.query(
+        'SELECT * FROM cobrancas WHERE corrida_id = $1',
+        [corrida_id]
+      );
+
+      if (cobResult.rows.length === 0) {
+        return reply.status(404).send({ error: 'Cobrança não encontrada' });
+      }
+
+      const cobranca = cobResult.rows[0];
+      await client.query(
+        `UPDATE cobrancas 
+         SET status = 'pago', pago_em = CURRENT_TIMESTAMP
+         WHERE id = $1`,
+        [cobranca.id]
+      );
+
+      await processarSplit(cobranca.id);
+
+      return { success: true, message: 'Pagamento simulado com sucesso' };
     } finally {
       client.release();
     }
