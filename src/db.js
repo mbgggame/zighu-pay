@@ -77,10 +77,10 @@ async function initializeDatabase() {
     const existe = await client.query(
       'SELECT id FROM apps_clientes WHERE nome = $1', ['mobihub']
     )
-    if (existe.rows.length === 0 && process.env.MOBIHUB_API_KEY && process.env.MOBIHUB_CALLBACK_URL) {
+    if (existe.rows.length === 0) {
       await client.query(
         'INSERT INTO apps_clientes (nome, api_key, callback_url) VALUES ($1, $2, $3)',
-        ['mobihub', process.env.MOBIHUB_API_KEY, process.env.MOBIHUB_CALLBACK_URL]
+        ['mobihub', process.env.ZIGHU_API_KEY, 'https://mobihub-s9yl.onrender.com/api/pay/callback']
       )
     }
     console.log('[DB] Banco inicializado com sucesso')
