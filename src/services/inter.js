@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const CERT_PATH = join(__dirname, '../certs/inter.crt')
-const KEY_PATH  = join(__dirname, '../certs/inter.key')
+const CERT_PATH = join(__dirname, '../../certs/inter.crt')
+const KEY_PATH  = join(__dirname, '../../certs/inter.key')
 export const MOCK_MODE = process.env.INTER_ENV !== 'producao'
 
 let tokenCache = null
