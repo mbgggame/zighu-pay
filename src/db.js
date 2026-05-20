@@ -1,13 +1,15 @@
-import pg from 'pg';
-import dotenv from 'dotenv';
+import pg from 'pg'
+import dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 
-const { Pool } = pg;
+const { Pool } = pg
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  family: 4
+})
 
 async function initializeDatabase() {
   const client = await pool.connect();
