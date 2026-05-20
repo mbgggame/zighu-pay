@@ -309,7 +309,8 @@ async function cobrancasRoutes(fastify, options) {
       const https = await import('https')
       const agent = new https.Agent({ cert, key, rejectUnauthorized: false })
       const { default: fetch } = await import('node-fetch')
-      const res = await fetch('https://cdpj.partners.bancointer.com.br/pix/v2/webhook', {
+      const chave = process.env.INTER_CHAVE_PIX
+      const res = await fetch(`https://cdpj.partners.bancointer.com.br/pix/v2/webhook/${chave}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ webhookUrl: url }),
