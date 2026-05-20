@@ -1,7 +1,15 @@
 import { pool } from '../db.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { gerarQRCode, MOCK_MODE, autenticar } from '../services/inter.js';
 import { processarSplit } from './split.js';
 import { v4 as uuidv4 } from 'uuid';
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const CERT_PATH = join(__dirname, '../certs/inter.crt')
+const KEY_PATH  = join(__dirname, '../certs/inter.key')
 
 async function cobrancasRoutes(fastify, options) {
   fastify.post('/zighu/cobranca', async (request, reply) => {
@@ -290,6 +298,29 @@ async function cobrancasRoutes(fastify, options) {
       };
     }
   });
+
+  // POST /zighu/admin/inter/webhook/cadastrar
+  fastify.post('/zighu/admin/inter/webhook/cadastrar', async (request, reply) => {
+    try {
+      const { url } = request.body
+      const token = await autenticar()
+      const cert = readFileSync(CERT_PATH)
+      const key  = readFileSync(KEY_PATH)
+      const https = await import('https')
+      const agent = new https.Agent({ cert, key, rejectUnauthorized: false })
+      const { default: fetch } = await import('node-fetch')
+      const res = await fetch('https://cdpj.partners.bancointer.com.br/pix/v2/webhook', {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhookUrl: url }),
+        agent
+      })
+      const text = await res.text()
+      return { sucesso: res.ok, status: res.status, resposta: text }
+    } catch(e) {
+      return reply.code(500).send({ sucesso: false, erro: e.message })
+    }
+  })
 }
 
 export default cobrancasRoutes;
