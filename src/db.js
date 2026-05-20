@@ -4,14 +4,22 @@ dotenv.config()
 
 const { Pool } = pg
 
+// Extrai parâmetros da URL para forçar IPv4
+const dbUrl = new URL(process.env.DATABASE_URL)
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  family: 4
+  host:               dbUrl.hostname,
+  port:               Number(dbUrl.port) || 6543,
+  database:           decodeURIComponent(dbUrl.pathname.slice(1)),
+  user:               decodeURIComponent(dbUrl.username),
+  password:           decodeURIComponent(dbUrl.password),
+  ssl:                { rejectUnauthorized: false },
+  family:             4,
+  connectionTimeoutMillis: 10000
 })
 
 async function initializeDatabase() {
-  const client = await pool.connect();
+  const client = await pool.connect()
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS cobrancas (
@@ -31,8 +39,7 @@ async function initializeDatabase() {
         pago_em TIMESTAMP,
         split_em TIMESTAMP
       )
-    `);
-
+    `)
     await client.query(`
       CREATE TABLE IF NOT EXISTS splits (
         id SERIAL PRIMARY KEY,
@@ -47,8 +54,7 @@ async function initializeDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         enviado_em TIMESTAMP
       )
-    `);
-
+    `)
     await client.query(`
       CREATE TABLE IF NOT EXISTS webhook_logs (
         id SERIAL PRIMARY KEY,
@@ -57,8 +63,7 @@ async function initializeDatabase() {
         processado BOOLEAN DEFAULT false,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `);
-
+    `)
     await client.query(`
       CREATE TABLE IF NOT EXISTS apps_clientes (
         id SERIAL PRIMARY KEY,
@@ -68,23 +73,20 @@ async function initializeDatabase() {
         ativo BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `);
-
-    const mobiHubExists = await client.query(
-      'SELECT id FROM apps_clientes WHERE nome = $1',
-      ['mobihub']
-    );
-    if (mobiHubExists.rows.length === 0 && process.env.MOBIHUB_API_KEY && process.env.MOBIHUB_CALLBACK_URL) {
+    `)
+    const existe = await client.query(
+      'SELECT id FROM apps_clientes WHERE nome = $1', ['mobihub']
+    )
+    if (existe.rows.length === 0 && process.env.MOBIHUB_API_KEY && process.env.MOBIHUB_CALLBACK_URL) {
       await client.query(
         'INSERT INTO apps_clientes (nome, api_key, callback_url) VALUES ($1, $2, $3)',
         ['mobihub', process.env.MOBIHUB_API_KEY, process.env.MOBIHUB_CALLBACK_URL]
-      );
+      )
     }
-
-    console.log('Banco de dados inicializado com sucesso');
+    console.log('[DB] Banco inicializado com sucesso')
   } finally {
-    client.release();
+    client.release()
   }
 }
 
-export { pool, initializeDatabase };
+export { pool, initializeDatabase }
