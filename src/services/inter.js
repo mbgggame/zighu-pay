@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
+import QRCode from 'qrcode'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -72,9 +73,10 @@ export async function gerarQRCode(valor, txid, descricao) {
     throw new Error(`Inter erro ao criar cobrança: ${cobText}`)
   }
   console.log('[INTER] Cobrança criada:', cob.txid)
+  const qrCodeBase64 = await QRCode.toDataURL(cob.pixCopiaECola)
   return {
     txid:           cob.txid,
-    qr_code:        null,
+    qr_code:        qrCodeBase64,
     pix_copia_cola: cob.pixCopiaECola,
     status:         cob.status,
     valor,
