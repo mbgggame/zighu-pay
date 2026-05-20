@@ -22,8 +22,12 @@ async function autenticar() {
   }
 
   try {
-    const cert = readFileSync(process.env.INTER_CERT_PATH)
-    const key = readFileSync(process.env.INTER_KEY_PATH)
+    const cert = process.env.INTER_CERT_BASE64
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      : readFileSync(process.env.INTER_CERT_PATH)
+    const key = process.env.INTER_KEY_BASE64
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      : readFileSync(process.env.INTER_KEY_PATH)
 
     const params = new URLSearchParams({
       client_id: process.env.INTER_CLIENT_ID,
@@ -70,8 +74,12 @@ async function gerarQRCode(valor, txid, descricao) {
 
   try {
     const token = await autenticar()
-    const cert = readFileSync(process.env.INTER_CERT_PATH)
-    const key = readFileSync(process.env.INTER_KEY_PATH)
+    const cert = process.env.INTER_CERT_BASE64
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      : readFileSync(process.env.INTER_CERT_PATH)
+    const key = process.env.INTER_KEY_BASE64
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      : readFileSync(process.env.INTER_KEY_PATH)
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
     const { default: fetch } = await import('node-fetch')
@@ -131,8 +139,12 @@ async function enviarPixOut(chave_pix, valor, descricao, txid_ref) {
 
   try {
     const token = await autenticar()
-    const cert = readFileSync(process.env.INTER_CERT_PATH)
-    const key = readFileSync(process.env.INTER_KEY_PATH)
+    const cert = process.env.INTER_CERT_BASE64
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      : readFileSync(process.env.INTER_CERT_PATH)
+    const key = process.env.INTER_KEY_BASE64
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      : readFileSync(process.env.INTER_KEY_PATH)
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
     const { default: fetch } = await import('node-fetch')
@@ -179,8 +191,12 @@ async function consultarPagamento(txid) {
 
   try {
     const token = await autenticar()
-    const cert = readFileSync(process.env.INTER_CERT_PATH)
-    const key = readFileSync(process.env.INTER_KEY_PATH)
+    const cert = process.env.INTER_CERT_BASE64
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      : readFileSync(process.env.INTER_CERT_PATH)
+    const key = process.env.INTER_KEY_BASE64
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      : readFileSync(process.env.INTER_KEY_PATH)
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
     const { default: fetch } = await import('node-fetch')
