@@ -317,6 +317,9 @@ async function cobrancasRoutes(fastify, options) {
         agent
       })
       const text = await res.text()
+      console.log('[WEBHOOK INTER] status:', res.status, 'resposta:', text)
+      console.log('[WEBHOOK INTER] token usado:', token?.substring(0, 20) + '...')
+      console.log('[WEBHOOK INTER] chave pix:', chave)
       return { sucesso: res.ok, status: res.status, resposta: text }
     } catch(e) {
       return reply.code(500).send({ sucesso: false, erro: e.message })
