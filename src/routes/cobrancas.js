@@ -247,8 +247,13 @@ async function cobrancasRoutes(fastify, options) {
     try {
       await autenticar();
       return { sucesso: true, modo: 'producao' };
-    } catch (error) {
-      return { sucesso: false, erro: error.message };
+    } catch (e) {
+      return {
+        sucesso: false,
+        erro: e.message,
+        stack: e.stack?.split('\n').slice(0, 3).join(' | '),
+        code: e.code
+      };
     }
   });
 }
