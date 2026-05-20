@@ -234,10 +234,44 @@ async function cobrancasRoutes(fastify, options) {
     }
   });
 
-  // PUT /zighu/admin/config — salva configuração do Inter (placeholder)
+  // PUT /zighu/admin/config — salva configuração do Inter
   fastify.put('/zighu/admin/config', async (request, reply) => {
-    return { success: true, message: 'Configuração recebida (implementar persistência)' };
-  });
+    const { inter_client_id, inter_client_secret, inter_chave_pix, inter_webhook_secret, inter_env } = request.body
+    const client = await pool.connect()
+    try {
+      await client.query(`
+        INSERT INTO config (chave, valor) VALUES
+          ('inter_client_id', $1),
+          ('inter_client_secret', $2),
+          ('inter_chave_pix', $3),
+          ('inter_webhook_secret', $4),
+          ('inter_env', $5)
+        ON CONFLICT (chave) DO UPDATE SET valor = EXCLUDED.valor, updated_at = CURRENT_TIMESTAMP
+      `, [
+        inter_client_id || '',
+        inter_client_secret || '',
+        inter_chave_pix || '',
+        inter_webhook_secret || '',
+        inter_env || 'mock'
+      ])
+      return { success: true }
+    } finally {
+      client.release()
+    }
+  })
+
+  // GET /zighu/admin/config — carrega configuração do Inter
+  fastify.get('/zighu/admin/config', async (request, reply) => {
+    const client = await pool.connect()
+    try {
+      const result = await client.query('SELECT chave, valor FROM config')
+      const config = {}
+      result.rows.forEach(r => { config[r.chave] = r.valor })
+      return config
+    } finally {
+      client.release()
+    }
+  })
 
   // GET /zighu/admin/inter/testar — testa conexão com Inter
   fastify.get('/zighu/admin/inter/testar', async (request, reply) => {

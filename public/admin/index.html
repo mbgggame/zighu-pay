@@ -105,7 +105,7 @@
           <div class="toggle-container">
             <span>Ambiente:</span>
             <label class="toggle-switch">
-              <input type="checkbox" id="toggleEnv">
+              <input type="checkbox" id="toggleEnv" onchange="atualizarLabelEnv()">
               <span class="toggle-slider"></span>
             </label>
             <span id="toggleLabel">Mock</span>
@@ -263,8 +263,24 @@
         carregarMetricas(),
         carregarApps(),
         carregarCobrancas(),
-        carregarLogs()
+        carregarLogs(),
+        carregarConfig()
       ]);
+    }
+
+    async function carregarConfig() {
+      try {
+        const config = await api('/zighu/admin/config');
+        document.getElementById('interClientId').value = config.inter_client_id || '';
+        document.getElementById('interClientSecret').value = config.inter_client_secret || '';
+        document.getElementById('interChavePix').value = config.inter_chave_pix || '';
+        document.getElementById('interWebhookSecret').value = config.inter_webhook_secret || '';
+        
+        const isProducao = config.inter_env === 'producao';
+        document.getElementById('toggleEnv').checked = isProducao;
+        document.getElementById('toggleLabel').textContent = isProducao ? 'Produção' : 'Mock';
+        document.getElementById('envBadge').textContent = isProducao ? 'Produção' : 'Mock';
+      } catch (e) { console.error(e); }
     }
 
     async function carregarMetricas() {
@@ -357,8 +373,27 @@
       carregarApps();
     }
 
+    function atualizarLabelEnv() {
+      const isProducao = document.getElementById('toggleEnv').checked;
+      document.getElementById('toggleLabel').textContent = isProducao ? 'Produção' : 'Mock';
+    }
+
     async function salvarConfig() {
-      alert('Configuração salva (implementar no backend)');
+      try {
+        const isProducao = document.getElementById('toggleEnv').checked;
+        await api('/zighu/admin/config', {
+          method: 'PUT',
+          body: JSON.stringify({
+            inter_client_id: document.getElementById('interClientId').value,
+            inter_client_secret: document.getElementById('interClientSecret').value,
+            inter_chave_pix: document.getElementById('interChavePix').value,
+            inter_webhook_secret: document.getElementById('interWebhookSecret').value,
+            inter_env: isProducao ? 'producao' : 'mock'
+          })
+        });
+        document.getElementById('envBadge').textContent = isProducao ? 'Produção' : 'Mock';
+        alert('Configuração salva!');
+      } catch (e) { alert('Erro ao salvar configuração'); }
     }
 
     async function testarConexaoInter() {

@@ -67,6 +67,13 @@ async function initializeDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS config (
+        chave TEXT PRIMARY KEY,
+        valor TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
     const existe = await client.query(
       'SELECT id FROM apps_clientes WHERE nome = $1', ['mobihub']
     )
