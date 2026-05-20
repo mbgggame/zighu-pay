@@ -28,8 +28,8 @@ fastify.addHook('preHandler', async (request, reply) => {
   if (publicRoutes.some(r => request.url.startsWith(r))) {
     return;
   }
-  // Libera rotas admin
-  if (request.url.startsWith('/admin') || request.url === '/') {
+  // Libera rotas estáticas do admin
+  if ((request.url.startsWith('/admin') && !request.url.startsWith('/zighu/admin')) || request.url === '/') {
     return;
   }
 
