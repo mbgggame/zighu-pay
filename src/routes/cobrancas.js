@@ -8,8 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const CERT_PATH = join(__dirname, '../certs/inter.crt')
-const KEY_PATH  = join(__dirname, '../certs/inter.key')
+const CERT_PATH = join(__dirname, '../../certs/inter.crt')
+const KEY_PATH  = join(__dirname, '../../certs/inter.key')
 
 async function cobrancasRoutes(fastify, options) {
   fastify.post('/zighu/cobranca', async (request, reply) => {
