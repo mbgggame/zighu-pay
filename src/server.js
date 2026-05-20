@@ -24,12 +24,12 @@ fastify.register(fastifyStatic, {
 })
 
 fastify.addHook('preHandler', async (request, reply) => {
-  // Não autentica rotas do painel admin (arquivos estáticos)
-  if (request.url.startsWith('/admin') || request.url === '/') {
+  const publicRoutes = ['/zighu/webhook/inter', '/zighu/health'];
+  if (publicRoutes.some(r => request.url.startsWith(r))) {
     return;
   }
-  const publicRoutes = ['/zighu/webhook/inter', '/zighu/health'];
-  if (publicRoutes.includes(request.routerPath)) {
+  // Libera rotas admin
+  if (request.url.startsWith('/admin') || request.url === '/') {
     return;
   }
 
