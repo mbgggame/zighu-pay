@@ -4,18 +4,11 @@ dotenv.config()
 
 const { Pool } = pg
 
-// Extrai parâmetros da URL para forçar IPv4
-const dbUrl = new URL(process.env.DATABASE_URL)
-
 const pool = new Pool({
-  host:               dbUrl.hostname,
-  port:               Number(dbUrl.port) || 6543,
-  database:           decodeURIComponent(dbUrl.pathname.slice(1)),
-  user:               decodeURIComponent(dbUrl.username),
-  password:           decodeURIComponent(dbUrl.password),
-  ssl:                { rejectUnauthorized: false },
-  family:             4,
-  connectionTimeoutMillis: 10000
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL?.includes('sslmode=require')
+    ? { rejectUnauthorized: false }
+    : false
 })
 
 async function initializeDatabase() {
