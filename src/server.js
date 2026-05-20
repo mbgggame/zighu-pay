@@ -1,6 +1,9 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+import fastifyStatic from '@fastify/static'
 import { initializeDatabase, pool } from './db.js';
 import cobrancasRoutes from './routes/cobrancas.js';
 import webhookRoutes from './routes/webhook.js';
@@ -8,13 +11,21 @@ import splitRoutes from './routes/split.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 const fastify = Fastify({ logger: true });
 
 fastify.register(cors);
 
+fastify.register(fastifyStatic, {
+  root: join(__dirname, '../public'),
+  prefix: '/'
+})
+
 fastify.addHook('preHandler', async (request, reply) => {
-  const publicRoutes = ['/zighu/webhook/inter', '/zighu/health'];
-  if (publicRoutes.includes(request.routerPath)) {
+  const publicRoutes = ['/zighu/webhook/inter', '/zighu/health', '/admin', '/admin/index.html'];
+  if (publicRoutes.includes(request.routerPath) || request.routerPath.startsWith('/admin')) {
     return;
   }
 

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Zighu Pay — Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; }
+    body { background-color: #F9F4FE; color: #1A1A1A; }
+    :root { --primary: #820AD1; --primary-hover: #6B0AAD; --secondary: #F0E6FA; --bg: #F9F4FE; --card: #FFFFFF; --text: #1A1A1A; --text-light: #666; --success: #10B981; --danger: #EF4444; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    header { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 16px 0; margin-bottom: 32px; }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 700; color: var(--primary); }
+    .header-right { display: flex; gap: 16px; align-items: center; }
+    .badge { padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; background: var(--secondary); color: var(--primary); }
+    .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--secondary); color: var(--primary); }
+    .btn-secondary:hover { background: #E5D5F5; }
+    .btn-ghost { background: transparent; color: var(--text); }
+    .btn-small { padding: 6px 12px; font-size: 14px; }
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 32px; }
+    .stat-card h3 { font-size: 14px; color: var(--text-light); margin-bottom: 8px; font-weight: 500; }
+    .stat-card .value { font-size: 32px; font-weight: 700; color: var(--primary); }
+    .section { margin-bottom: 40px; }
+    .section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 15px; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(130, 10, 209, 0.1); }
+    .toggle-container { display: flex; gap: 16px; align-items: center; margin-bottom: 24px; }
+    .toggle-switch { position: relative; width: 50px; height: 26px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 26px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: var(--primary); }
+    input:checked + .toggle-slider:before { transform: translateX(24px); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #F3F4F6; }
+    th { font-size: 13px; font-weight: 700; color: var(--text-light); text-transform: uppercase; }
+    td { font-size: 14px; }
+    .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .status-aguardando { background: #FEF3C7; color: #92400E; }
+    .status-pago { background: #D1FAE5; color: #065F46; }
+    .status-pendente { background: #E5E7EB; color: #374151; }
+    .status-realizado { background: #D1FAE5; color: #065F46; }
+    .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .login-card { width: 100%; max-width: 400px; }
+    .hidden { display: none !important; }
+    .flex { display: flex; gap: 12px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  </style>
+</head>
+<body>
+  <div id="login" class="login-container">
+    <div class="login-card card">
+      <div class="logo" style="justify-content: center; margin-bottom: 32px;">⚡ Zighu Pay</div>
+      <div class="form-group">
+        <label>API Key</label>
+        <input type="password" id="loginApiKey" placeholder="Digite sua API Key">
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="login()">Entrar</button>
+    </div>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <header>
+      <div class="container flex-between">
+        <div class="logo">⚡ Zighu Pay</div>
+        <div class="header-right">
+          <span id="envBadge" class="badge">Mock</span>
+          <button class="btn btn-ghost btn-small" onclick="logout()">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid-4">
+        <div class="card stat-card">
+          <h3>Total de cobranças hoje</h3>
+          <div class="value" id="totalCobrancas">0</div>
+        </div>
+        <div class="card stat-card">
+          <h3>Valor processado hoje</h3>
+          <div class="value" id="valorProcessado">R$ 0,00</div>
+        </div>
+        <div class="card stat-card">
+          <h3>Splits realizados hoje</h3>
+          <div class="value" id="totalSplits">0</div>
+        </div>
+        <div class="card stat-card">
+          <h3>Status do Inter</h3>
+          <div class="value" id="statusInter" style="font-size: 18px;">Mock</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <h2>Configuração do Gateway</h2>
+          
+          <div class="toggle-container">
+            <span>Ambiente:</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleEnv">
+              <span class="toggle-slider"></span>
+            </label>
+            <span id="toggleLabel">Mock</span>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>INTER_CLIENT_ID</label>
+              <input type="text" id="interClientId">
+            </div>
+            <div class="form-group">
+              <label>INTER_CLIENT_SECRET</label>
+              <input type="password" id="interClientSecret">
+            </div>
+            <div class="form-group">
+              <label>INTER_CHAVE_PIX</label>
+              <input type="text" id="interChavePix">
+            </div>
+            <div class="form-group">
+              <label>INTER_WEBHOOK_SECRET</label>
+              <input type="text" id="interWebhookSecret">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>INTER_CERT (.crt)</label>
+              <input type="file" id="interCert">
+            </div>
+            <div class="form-group">
+              <label>INTER_KEY (.key)</label>
+              <input type="file" id="interKey">
+            </div>
+          </div>
+
+          <div class="flex" style="margin-top: 24px;">
+            <button class="btn btn-primary" onclick="salvarConfig()">Salvar e reiniciar</button>
+            <button class="btn btn-secondary" onclick="testarConexaoInter()">Testar conexão Inter</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <div class="flex-between" style="margin-bottom: 20px;">
+            <h2>Apps Clientes</h2>
+            <button class="btn btn-primary btn-small" onclick="abrirModalNovoApp()">Adicionar app</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>API Key</th>
+                <th>Callback URL</th>
+                <th>Ativo</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="appsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <div class="flex-between" style="margin-bottom: 20px;">
+            <h2>Cobranças do dia</h2>
+            <div class="flex">
+              <input type="date" id="filtroData" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #E5E7EB;">
+              <button class="btn btn-secondary btn-small" onclick="carregarCobrancas()">Filtrar</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Corrida ID</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Motorista</th>
+                <th>Split</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="cobrancasTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <h2>Logs</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Origem</th>
+                <th>Status</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="logsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalNovoApp" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;">
+    <div class="card" style="width: 100%; max-width: 500px;">
+      <div class="flex-between" style="margin-bottom: 20px;">
+        <h2>Novo App</h2>
+        <button class="btn btn-ghost btn-small" onclick="fecharModalNovoApp()">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Nome do app</label>
+        <input type="text" id="novoAppNome">
+      </div>
+      <div class="form-group">
+        <label>Callback URL</label>
+        <input type="text" id="novoAppCallback">
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="criarApp()">Criar app</button>
+    </div>
+  </div>
+
+  <script>
+    let apiKey = localStorage.getItem('zighu_admin_key');
+    const baseUrl = window.location.origin;
+
+    async function api(endpoint, options = {}) {
+      const headers = { 'Content-Type': 'application/json', ...options.headers };
+      if (apiKey) headers['x-api-key'] = apiKey;
+      const res = await fetch(`${baseUrl}${endpoint}`, { ...options, headers });
+      if (!res.ok) throw new Error('Erro na requisição');
+      return res.json();
+    }
+
+    function login() {
+      apiKey = document.getElementById('loginApiKey').value;
+      localStorage.setItem('zighu_admin_key', apiKey);
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      carregarDashboard();
+    }
+
+    function logout() {
+      localStorage.removeItem('zighu_admin_key');
+      apiKey = null;
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('login').classList.remove('hidden');
+    }
+
+    async function carregarDashboard() {
+      await Promise.all([
+        carregarMetricas(),
+        carregarApps(),
+        carregarCobrancas(),
+        carregarLogs()
+      ]);
+    }
+
+    async function carregarMetricas() {
+      try {
+        const data = await api('/zighu/admin/dashboard');
+        document.getElementById('totalCobrancas').textContent = data.total_cobrancas;
+        document.getElementById('valorProcessado').textContent = `R$ ${data.valor_processado.toFixed(2).replace('.', ',')}`;
+        document.getElementById('totalSplits').textContent = data.total_splits;
+        document.getElementById('statusInter').textContent = data.status_inter;
+      } catch (e) { console.error(e); }
+    }
+
+    async function carregarApps() {
+      try {
+        const apps = await api('/zighu/admin/apps');
+        const tbody = document.getElementById('appsTable');
+        tbody.innerHTML = apps.map(app => `
+          <tr>
+            <td>${app.nome}</td>
+            <td><code>${app.api_key}</code></td>
+            <td>${app.callback_url}</td>
+            <td>${app.ativo ? '✅' : '❌'}</td>
+            <td class="flex">
+              <button class="btn btn-secondary btn-small" onclick="copiarApiKey('${app.api_key}')">Copiar</button>
+              <button class="btn btn-ghost btn-small" onclick="toggleApp(${app.id}, ${!app.ativo})">${app.ativo ? 'Desativar' : 'Ativar'}</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function carregarCobrancas() {
+      try {
+        const dataInput = document.getElementById('filtroData').value || new Date().toISOString().split('T')[0];
+        const cobrancas = await api(`/zighu/admin/cobran?data=${dataInput}`);
+        const tbody = document.getElementById('cobrancasTable');
+        tbody.innerHTML = cobrancas.map(c => `
+          <tr>
+            <td>${c.corrida_id}</td>
+            <td>R$ ${c.valor.toFixed(2).replace('.', ',')}</td>
+            <td><span class="status-badge status-${c.status}">${c.status}</span></td>
+            <td>${c.motorista_id}</td>
+            <td><span class="status-badge ${c.split_status === 'enviado' ? 'status-realizado' : 'status-pendente'}">${c.split_status || 'pendente'}</span></td>
+            <td>${new Date(c.created_at).toLocaleString('pt-BR')}</td>
+            <td>
+              <button class="btn btn-primary btn-small" onclick="simularPagamento(${c.corrida_id})" id="simularBtn${c.corrida_id}">Simular</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function carregarLogs() {
+      try {
+        const logs = await api('/zighu/admin/logs');
+        const tbody = document.getElementById('logsTable');
+        tbody.innerHTML = logs.map(log => `
+          <tr>
+            <td>${log.origem}</td>
+            <td>${log.processado ? '✅ Processado' : '⏳ Pendente'}</td>
+            <td>${new Date(log.created_at).toLocaleString('pt-BR')}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function copiarApiKey(key) {
+      navigator.clipboard.writeText(key);
+      alert('API Key copiada!');
+    }
+
+    async function toggleApp(id, ativo) {
+      await api(`/zighu/admin/apps/${id}`, { method: 'PUT', body: JSON.stringify({ ativo }) });
+      carregarApps();
+    }
+
+    function abrirModalNovoApp() {
+      document.getElementById('modalNovoApp').classList.remove('hidden');
+    }
+
+    function fecharModalNovoApp() {
+      document.getElementById('modalNovoApp').classList.add('hidden');
+    }
+
+    async function criarApp() {
+      const nome = document.getElementById('novoAppNome').value;
+      const callback_url = document.getElementById('novoAppCallback').value;
+      await api('/zighu/admin/apps', { method: 'POST', body: JSON.stringify({ nome, callback_url }) });
+      fecharModalNovoApp();
+      carregarApps();
+    }
+
+    async function salvarConfig() {
+      alert('Configuração salva (implementar no backend)');
+    }
+
+    async function testarConexaoInter() {
+      try {
+        const res = await api('/zighu/admin/inter/testar');
+        alert('Conexão: ' + (res.sucesso ? 'OK' : 'Falha'));
+      } catch (e) { alert('Erro na conexão'); }
+    }
+
+    async function simularPagamento(corridaId) {
+      try {
+        await api('/zighu/mock/simular-pagamento', { method: 'POST', body: JSON.stringify({ corrida_id: corridaId }) });
+        alert('Pagamento simulado!');
+        carregarDashboard();
+      } catch (e) { alert('Erro ao simular'); }
+    }
+
+    if (apiKey) {
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      carregarDashboard();
+    }
+  </script>
+</body>
+</html>
