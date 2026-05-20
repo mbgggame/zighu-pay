@@ -65,11 +65,18 @@ export async function gerarQRCode(valor, txid, descricao) {
     }),
     agent
   })
-  const cob = await res.json()
-  const resQr = await fetch(`https://cdpj.partners.bancointer.com.br/pix/v2/loc/${cob.loc?.id}/qrcode`, {
+  const cobText = await res.text()
+  console.log('[INTER] gerarQRCode resposta:', cobText)
+  const cob = JSON.parse(cobText)
+  if (!cob.loc?.id) {
+    throw new Error(`Inter erro ao criar cobrança: ${cobText}`)
+  }
+  const resQr = await fetch(`https://cdpj.partners.bancointer.com.br/pix/v2/loc/${cob.loc.id}/qrcode`, {
     headers: { 'Authorization': `Bearer ${token}` }, agent
   })
-  const qr = await resQr.json()
+  const qrText = await resQr.text()
+  console.log('[INTER] QR Code resposta:', qrText)
+  const qr = JSON.parse(qrText)
   return { txid: cob.txid, qr_code: qr.imagemQrcode, pix_copia_cola: qr.qrcode, status: cob.status, valor, mock: false }
 }
 
