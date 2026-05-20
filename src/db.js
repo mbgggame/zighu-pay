@@ -1,14 +1,21 @@
 import pg from 'pg'
 import dotenv from 'dotenv'
-
 dotenv.config()
 
 const { Pool } = pg
 
+// Parseia a connection string manualmente para forçar IPv4
+const connectionString = process.env.DATABASE_URL
+const url = new URL(connectionString)
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  family: 4
+  host:     url.hostname,
+  port:     parseInt(url.port) || 5432,
+  database: url.pathname.replace('/', ''),
+  user:     url.username,
+  password: url.password,
+  ssl:      { rejectUnauthorized: false },
+  family:   4
 })
 
 async function initializeDatabase() {
