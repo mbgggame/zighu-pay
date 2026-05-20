@@ -22,12 +22,19 @@ async function autenticar() {
   }
 
   try {
-    const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_CERT_PATH)
-    const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_KEY_PATH)
+    let cert, key
+    if (process.env.INTER_CERT_BASE64) {
+      const certStr = Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8')
+      cert = certStr.includes('-----') ? certStr : certStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      cert = readFileSync(process.env.INTER_CERT_PATH)
+    }
+    if (process.env.INTER_KEY_BASE64) {
+      const keyStr = Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8')
+      key = keyStr.includes('-----') ? keyStr : keyStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      key = readFileSync(process.env.INTER_KEY_PATH)
+    }
 
     const params = new URLSearchParams({
       client_id: process.env.INTER_CLIENT_ID,
@@ -74,12 +81,19 @@ async function gerarQRCode(valor, txid, descricao) {
 
   try {
     const token = await autenticar()
-    const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_CERT_PATH)
-    const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_KEY_PATH)
+    let cert, key
+    if (process.env.INTER_CERT_BASE64) {
+      const certStr = Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8')
+      cert = certStr.includes('-----') ? certStr : certStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      cert = readFileSync(process.env.INTER_CERT_PATH)
+    }
+    if (process.env.INTER_KEY_BASE64) {
+      const keyStr = Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8')
+      key = keyStr.includes('-----') ? keyStr : keyStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      key = readFileSync(process.env.INTER_KEY_PATH)
+    }
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
     const { default: fetch } = await import('node-fetch')
@@ -139,12 +153,19 @@ async function enviarPixOut(chave_pix, valor, descricao, txid_ref) {
 
   try {
     const token = await autenticar()
-    const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_CERT_PATH)
-    const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_KEY_PATH)
+    let cert, key
+    if (process.env.INTER_CERT_BASE64) {
+      const certStr = Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8')
+      cert = certStr.includes('-----') ? certStr : certStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      cert = readFileSync(process.env.INTER_CERT_PATH)
+    }
+    if (process.env.INTER_KEY_BASE64) {
+      const keyStr = Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8')
+      key = keyStr.includes('-----') ? keyStr : keyStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      key = readFileSync(process.env.INTER_KEY_PATH)
+    }
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
     const { default: fetch } = await import('node-fetch')
@@ -191,12 +212,19 @@ async function consultarPagamento(txid) {
 
   try {
     const token = await autenticar()
-    const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_CERT_PATH)
-    const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
-      : readFileSync(process.env.INTER_KEY_PATH)
+    let cert, key
+    if (process.env.INTER_CERT_BASE64) {
+      const certStr = Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8')
+      cert = certStr.includes('-----') ? certStr : certStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      cert = readFileSync(process.env.INTER_CERT_PATH)
+    }
+    if (process.env.INTER_KEY_BASE64) {
+      const keyStr = Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8')
+      key = keyStr.includes('-----') ? keyStr : keyStr.replace(/(.{64})/g, '$1\n')
+    } else {
+      key = readFileSync(process.env.INTER_KEY_PATH)
+    }
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
     const { default: fetch } = await import('node-fetch')
