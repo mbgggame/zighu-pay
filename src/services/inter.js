@@ -23,10 +23,10 @@ async function autenticar() {
 
   try {
     const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_CERT_PATH)
     const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_KEY_PATH)
 
     const params = new URLSearchParams({
@@ -75,10 +75,10 @@ async function gerarQRCode(valor, txid, descricao) {
   try {
     const token = await autenticar()
     const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_CERT_PATH)
     const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_KEY_PATH)
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
@@ -140,10 +140,10 @@ async function enviarPixOut(chave_pix, valor, descricao, txid_ref) {
   try {
     const token = await autenticar()
     const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_CERT_PATH)
     const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_KEY_PATH)
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
@@ -192,10 +192,10 @@ async function consultarPagamento(txid) {
   try {
     const token = await autenticar()
     const cert = process.env.INTER_CERT_BASE64
-      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_CERT_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_CERT_PATH)
     const key = process.env.INTER_KEY_BASE64
-      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64')
+      ? Buffer.from(process.env.INTER_KEY_BASE64, 'base64').toString('utf8').replace(/\\n/g, '\n')
       : readFileSync(process.env.INTER_KEY_PATH)
     const https = await import('https')
     const agent = new https.Agent({ cert, key })
