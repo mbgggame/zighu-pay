@@ -44,6 +44,48 @@ export async function autenticar() {
   return tokenCache
 }
 
+let tokenBankingCache = null
+let tokenBankingExpira = 0
+
+export async function autenticarBanking() {
+  if (MOCK_MODE) return 'mock-token'
+  if (tokenBankingCache && Date.now() < tokenBankingExpira) return tokenBankingCache
+  const cert = readFileSync(CERT_PATH)
+  const key  = readFileSync(KEY_PATH)
+  const https = await import('https')
+  const agent = new https.Agent({ cert, key, rejectUnauthorized: false })
+  const { default: fetch } = await import('node-fetch')
+  // Tenta diferentes scopes Banking
+  const scopes = [
+    'banking.pix.write banking.pix.read',
+    'pagamentos.write pagamentos.read',
+    'pix.write pix.read banking.write banking.read',
+  ]
+  for (const scope of scopes) {
+    const params = new URLSearchParams({
+      client_id: process.env.INTER_CLIENT_ID,
+      client_secret: process.env.INTER_CLIENT_SECRET,
+      grant_type: 'client_credentials',
+      scope
+    })
+    const res = await fetch('https://cdpj.partners.bancointer.com.br/oauth/v2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+      agent
+    })
+    const data = await res.json()
+    if (data.access_token) {
+      console.log('[INTER] Banking scope funcionou:', scope)
+      tokenBankingCache = data.access_token
+      tokenBankingExpira = Date.now() + (data.expires_in - 60) * 1000
+      return tokenBankingCache
+    }
+    console.log('[INTER] Banking scope falhou:', scope, data)
+  }
+  throw new Error('Nenhum scope Banking funcionou')
+}
+
 export async function gerarQRCode(valor, txid, descricao) {
   if (MOCK_MODE) {
     console.log(`[INTER MOCK] gerarQRCode() — R$ ${valor}`)
@@ -84,12 +126,12 @@ export async function gerarQRCode(valor, txid, descricao) {
   }
 }
 
-export async function enviarPixOut(chave_pix, valor, descricao) {
+export async function enviarPixOut(chave_pix, valor, descricao, txid) {
   if (MOCK_MODE) {
     console.log(`[INTER MOCK] enviarPixOut() — R$ ${valor} → ${chave_pix}`)
-    return { id: `mock-${uuidv4()}`, status: 'REALIZADO', valor, chave_pix, mock: true }
+    return { endToEndId: `mock-${uuidv4()}`, status: 'REALIZADO', valor, chave_pix, mock: true }
   }
-  const token = await autenticar()
+  const token = await autenticarBanking()
   const cert = readFileSync(CERT_PATH)
   const key  = readFileSync(KEY_PATH)
   const https = await import('https')
@@ -112,7 +154,7 @@ export async function enviarPixOut(chave_pix, valor, descricao) {
   console.log('[INTER] enviarPixOut resposta:', text)
   let data = {}
   try { data = JSON.parse(text) } catch(e) {}
-  return { id: data.endToEndId || text, status: data.status || 'enviado', valor, chave_pix, mock: false }
+  return { endToEndId: data.endToEndId || text, status: data.status || 'enviado', valor, chave_pix, mock: false }
 }
 
 export async function consultarPagamento(txid) {
