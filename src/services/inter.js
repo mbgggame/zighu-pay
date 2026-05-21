@@ -11,7 +11,7 @@ const KEY_PATH  = join(__dirname, '../../certs/inter.key')
 export const MOCK_MODE = process.env.INTER_ENV !== 'producao'
 
 let tokenCache = null
-let tokenExpira = null
+let tokenExpira = 0
 // Força renovação do token ao iniciar
 
 export async function autenticar() {
