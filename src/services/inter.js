@@ -101,8 +101,11 @@ export async function enviarPixOut(chave_pix, valor, descricao) {
     body: JSON.stringify({ valor: valor.toFixed(2), chave: chave_pix, descricao }),
     agent
   })
-  const data = await res.json()
-  return { id: data.endToEndId, status: data.status, valor, chave_pix, mock: false }
+  const text = await res.text()
+  console.log('[INTER] enviarPixOut resposta:', text)
+  let data = {}
+  try { data = JSON.parse(text) } catch(e) {}
+  return { id: data.endToEndId || text, status: data.status || 'enviado', valor, chave_pix, mock: false }
 }
 
 export async function consultarPagamento(txid) {
