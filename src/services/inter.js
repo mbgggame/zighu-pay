@@ -95,10 +95,17 @@ export async function enviarPixOut(chave_pix, valor, descricao) {
   const https = await import('https')
   const agent = new https.Agent({ cert, key, rejectUnauthorized: false })
   const { default: fetch } = await import('node-fetch')
-  const res = await fetch('https://cdpj.partners.bancointer.com.br/pix/v2/pix', {
+  const res = await fetch('https://cdpj.partners.bancointer.com.br/banking/v2/pix', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ valor: valor.toFixed(2), chave: chave_pix, descricao }),
+    body: JSON.stringify({
+      valor: valor.toFixed(2),
+      destinatario: {
+        tipo: 'CHAVE',
+        chave: chave_pix
+      },
+      descricao: descricao
+    }),
     agent
   })
   const text = await res.text()

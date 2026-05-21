@@ -44,8 +44,8 @@ async function webhookRoutes(fastify, options) {
           await processarSplit(cobranca.id);
 
           await client.query(
-            'UPDATE webhook_logs SET processado = true WHERE origem = $1 AND payload->>\'pix\' @> $2',
-            ['inter', JSON.stringify([pix])]
+            'UPDATE webhook_logs SET processado = true WHERE origem = $1',
+            ['inter']
           );
         }
       }
