@@ -25,7 +25,7 @@ async function cobrancasRoutes(fastify, options) {
          (corrida_id, valor, motorista_id, chave_pix_motorista, percentual_motorista, app_origem, inter_txid, qr_code, pix_copia_cola, status)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'aguardando_pagamento')
          RETURNING id, qr_code, pix_copia_cola, inter_txid, status`,
-        [corrida_id, valor, motorista_id, chave_pix, percentual_motorista, app_origem, txid, qrData.qrcode, qrData.pixCopiaECola]
+        [corrida_id, valor, motorista_id, chave_pix, percentual_motorista, app_origem, txid, qrData.qr_code, qrData.pix_copia_cola]
       );
 
       const cobranca = result.rows[0];
