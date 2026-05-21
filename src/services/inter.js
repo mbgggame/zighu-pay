@@ -151,6 +151,7 @@ export async function enviarPixOut(chave_pix, valor, descricao, txid) {
     }),
     agent
   })
+  console.log('[INTER] enviarPixOut status HTTP:', res.status)
   const text = await res.text()
   console.log('[INTER] enviarPixOut resposta:', text)
   let data = {}
