@@ -26,7 +26,7 @@ export async function autenticar() {
     client_id:     process.env.INTER_CLIENT_ID,
     client_secret: process.env.INTER_CLIENT_SECRET,
     grant_type:    'client_credentials',
-    scope:         'pix.read pix.write cob.read cob.write'
+    scope:         'pix.read pix.write cob.read cob.write pagamentos.write pagamentos.read'
   })
   const https = await import('https')
   const agent = new https.Agent({ cert, key, rejectUnauthorized: false })
