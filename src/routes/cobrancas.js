@@ -325,6 +325,46 @@ async function cobrancasRoutes(fastify, options) {
       return reply.code(500).send({ sucesso: false, erro: e.message })
     }
   })
+
+  fastify.get('/zighu/admin/inter/testar-scopes', async (request, reply) => {
+    const { readFileSync } = await import('fs')
+    const { join } = await import('path')
+    const { fileURLToPath } = await import('url')
+    const __filename = fileURLToPath(import.meta.url)
+    const __dirname = dirname(__filename)
+    const CERT_PATH = join(__dirname, '../../certs/inter.crt')
+    const KEY_PATH  = join(__dirname, '../../certs/inter.key')
+    const cert = readFileSync(CERT_PATH)
+    const key  = readFileSync(KEY_PATH)
+    const https = await import('https')
+    const agent = new https.Agent({ cert, key, rejectUnauthorized: false })
+    const { default: fetch } = await import('node-fetch')
+    const scopes = [
+      'banking.pix.write',
+      'banking.read banking.write',
+      'pagamento.write',
+      'payment.write',
+      'pix.write',
+    ]
+    const results = []
+    for (const scope of scopes) {
+      const params = new URLSearchParams({
+        client_id: process.env.INTER_CLIENT_ID,
+        client_secret: process.env.INTER_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+        scope
+      })
+      const res = await fetch('https://cdpj.partners.bancointer.com.br/oauth/v2/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+        agent
+      })
+      const text = await res.text()
+      results.push({ scope, status: res.status, resposta: text.substring(0, 100) })
+    }
+    return results
+  })
 }
 
 export default cobrancasRoutes;
