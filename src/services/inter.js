@@ -57,9 +57,7 @@ export async function autenticarBanking() {
   const { default: fetch } = await import('node-fetch')
   // Tenta diferentes scopes Banking
   const scopes = [
-    'banking.pix.write banking.pix.read',
-    'pagamentos.write pagamentos.read',
-    'pix.write pix.read banking.write banking.read',
+    'pix.read pix.write cob.read cob.write webhook.read webhook.write pagamentos.write pagamentos.read',
   ]
   for (const scope of scopes) {
     const params = new URLSearchParams({
@@ -74,7 +72,10 @@ export async function autenticarBanking() {
       body: params.toString(),
       agent
     })
-    const data = await res.json()
+    const text = await res.text()
+    console.log('[INTER BANKING] scope testado:', scope, '| resposta:', text.substring(0, 200))
+    let data = {}
+    try { data = JSON.parse(text) } catch(e) { continue }
     if (data.access_token) {
       console.log('[INTER] Banking scope funcionou:', scope)
       tokenBankingCache = data.access_token
