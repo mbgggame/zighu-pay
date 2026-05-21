@@ -57,7 +57,7 @@ export async function autenticarBanking() {
   const { default: fetch } = await import('node-fetch')
   // Tenta diferentes scopes Banking
   const scopes = [
-    'pix.read pix.write cob.read cob.write webhook.read webhook.write pagamentos.write pagamentos.read',
+    'pagamento-pix.write pagamento-pix.read',
   ]
   for (const scope of scopes) {
     const params = new URLSearchParams({
